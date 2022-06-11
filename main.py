@@ -1,6 +1,8 @@
 import speech_recognition as sr
 import uvicorn
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, File
+from pydub import AudioSegment
+
 
 r = sr.Recognizer()
 
@@ -16,12 +18,29 @@ async def root():
     return {"message": "Hello World"}
 
 
+@app.post("/upload-file/")
+async def create_upload_file(uploaded_file: UploadFile = File(...)):
+    file_location = f"files/{uploaded_file.filename}"
+    open(file_location, "wb+").write(uploaded_file.file.read())
+    return {"info": f"file '{uploaded_file.filename}' saved at '{file_location}'"}
+
+
 @app.post("/test/")
-def create_upload_file(file: UploadFile):
-    with sr.AudioFile('example_audio_files/'+file.filename) as source:
+def create_upload_file(uploaded_file: UploadFile = File(...)):
+    file_location = f"files/{uploaded_file.filename}"
+    open(file_location, "wb+").write(uploaded_file.file.read())
+
+    if uploaded_file.content_type == "audio/mpeg":
+        name = uploaded_file.filename.split(".")
+        new_file = name[0]
+        sound = AudioSegment.from_mp3(file_location)
+        file_location = f"files/{new_file}.wav"
+        sound.export(file_location, format="wav")
+
+    with sr.AudioFile(file_location) as source:
         audio_text = r.listen(source)
         text = r.recognize_google(audio_text, language='pl-PL')
-        return {'Konwertowanie transkryptu audio na tekst ... '+text}
+        return {'Konwertowanie transkryptu audio na tekst: '+text}
 
 
 @app.get("/hello/{name}")
