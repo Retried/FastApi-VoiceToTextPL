@@ -32,9 +32,8 @@ def create_upload_file(uploaded_file: UploadFile = File(...)):
 
     if uploaded_file.content_type == "audio/mpeg":
         name = uploaded_file.filename.split(".")
-        new_file = name[0]
         sound = AudioSegment.from_mp3(file_location)
-        file_location = f"files/{new_file}.wav"
+        file_location = f"files/{name[0]}.wav"
         sound.export(file_location, format="wav")
 
     with sr.AudioFile(file_location) as source:
