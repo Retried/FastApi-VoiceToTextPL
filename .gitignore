@@ -1,3 +1,4 @@
 /venv/
 /example_audio_files/
 /ffmpeg/
+/files/**
