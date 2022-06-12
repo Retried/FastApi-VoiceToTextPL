@@ -2,9 +2,10 @@ import os
 import speech_recognition as sr
 import uvicorn
 
-from fastapi import FastAPI, UploadFile, File, Request, Query
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, UploadFile, File, Query, Request
+from fastapi.responses import RedirectResponse
+# from fastapi.responses import HTMLResponse
+# from fastapi.templating import Jinja2Templates
 
 from Cleanup import Cleanup
 from Splitter import SplitAudio
@@ -17,12 +18,16 @@ app = FastAPI(
     version="0.1"
 )
 
-templates = Jinja2Templates(directory="templates")  # Przygotowania pod formularz
+# templates = Jinja2Templates(directory="templates")  # Przygotowania pod formularz
 
 
-@app.get("/", response_class=HTMLResponse)  # Przygotowania pod formularz
-def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+# @app.get("/", response_class=HTMLResponse)  # Przygotowania pod formularz
+# def index(request: Request):
+#     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/")
+def index():
+    return RedirectResponse("http://127.0.0.1:8848/docs")
 
 
 @app.post("/uploaded/")
